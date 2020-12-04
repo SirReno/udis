@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="zxx">
+
+<head>
+    <meta charset="utf-8"/>
+
+    <title>Udis And Dollars</title>
+
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+
+
+<body>
+
+
+
+
+<div class="place-self-center">
+    <input id="startDate" type="date" name="Fecha Inicial">
+    <input id="endDate" type="date" name="Fecha Final">
+    <button id="udisButton"> get udis and dollars</button>
+    <div id="udisData"></div>
+</div>
+<div>
+    <div id="udisMax"></div>
+    <div id="udisMin"></div>
+    <div id="udisAvrg"></div>
+</div>
+
+<div id="container" style="width: 75%;">
+    <canvas id="population-chart" data-url="{% url 'udis:udis' %}"></canvas>
+</div>
+
+
+<div class="place-self-center">
+    <input id="startDateDollars" type="date" name="Fecha Inicial">
+    <input id="endDateDollars" type="date" name="Fecha Final">
+    <button id="dollarsButton"> get udis and dollars</button>
+
+</div>
+<div>
+    <div id="dollarsMax"></div>
+    <div id="dollarsMin"></div>
+    <div id="dollarsAvrg"></div>
+</div>
+
+<div id="container" style="width: 75%;">
+    <canvas id="dollars-chart" data-url="{% url 'udis:dollars' %}"></canvas>
+</div>
+<script>
+    $('#udisButton').click(
+        function () {
+
+            var $populationChart = $("#population-chart");
+            $.ajax({
+                url: $populationChart.data("url"),
+                method: 'GET',
+                data: {
+                    'startDate': $("#startDate").val(),
+                    'endDate': $("#endDate").val()
+                },
+                success: function (data) {
+
+                    var ctx = $populationChart[0].getContext("2d");
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Udis',
+                                backgroundColor: 'blue',
+                                data: data.data
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Udis Bar Chart'
+                            }
+                        }
+                    });
+
+                    $('#udisMax').html("Max Value "+data.max)
+                    $('#udisMin').html("Min Value "+data.min)
+                    $('#udisAvrg').html("Average Value "+data.average)
+                }
+            });
+        }
+    )
+
+
+    $('#dollarsButton').click(
+        function () {
+
+            var $populationChart = $("#dollars-chart");
+            $.ajax({
+                url: $populationChart.data("url"),
+                method: 'GET',
+                data: {
+                    'startDate': $("#startDateDollars").val(),
+                    'endDate': $("#endDateDollars").val()
+                },
+                success: function (data) {
+
+                    var ctx = $populationChart[0].getContext("2d");
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Dollars',
+                                backgroundColor: 'red',
+                                data: data.data
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Dollars Bar Chart'
+                            }
+                        }
+                    });
+
+                    $('#dollarsMax').html("Max Value "+ data.max)
+                    $('#dollarsMin').html("Min Value "+ data.min)
+                    $('#dollarsAvrg').html("Average Value "+data.average)
+                }
+            });
+        }
+    )
+
+
+</script>
+
+</body>
